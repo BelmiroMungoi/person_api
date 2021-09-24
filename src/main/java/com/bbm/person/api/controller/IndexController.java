@@ -7,8 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bbm.person.api.model.Usuario;
@@ -22,6 +24,7 @@ public class IndexController {
 	private UsuarioRepository usuarioRepository;
 
 	@PostMapping(value = "/", produces = "application/json")
+	@ResponseBody
 	public ResponseEntity<Usuario> saveUser(@RequestBody Usuario usuario) {
 
 		Usuario user = usuarioRepository.save(usuario);
@@ -43,5 +46,21 @@ public class IndexController {
 		Usuario usuario = usuarioRepository.findById(id).get();
 
 		return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+	}
+	
+	@PutMapping(value = "/", produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> updateUser(@RequestBody Usuario usuario) {
+
+		if (usuario.getId() == null) {
+
+			return new ResponseEntity<String>("Id do usuario não foi informado", HttpStatus.OK);
+
+		} else {
+			Usuario user = usuarioRepository.saveAndFlush(usuario);
+
+			return new ResponseEntity<Usuario>(user, HttpStatus.OK);
+		}
+
 	}
 }
