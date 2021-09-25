@@ -55,7 +55,7 @@ public class IndexController {
 
 		if (usuario.getId() == null) {
 
-			return new ResponseEntity<String>("Id do usuario não foi informado", HttpStatus.OK);
+			return new ResponseEntity<String>("Usuário não encontrado para edicão", HttpStatus.OK);
 
 		} else {
 			Usuario user = usuarioRepository.saveAndFlush(usuario);
