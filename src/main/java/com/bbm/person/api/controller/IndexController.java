@@ -62,6 +62,11 @@ public class IndexController {
 			return new ResponseEntity<String>("Usuário não encontrado para edicão", HttpStatus.OK);
 
 		} else {
+
+			for (int i = 0; i < usuario.getEnderecos().size(); i++) {
+				usuario.getEnderecos().get(i).setUsuario(usuario);
+			}
+
 			Usuario user = usuarioRepository.saveAndFlush(usuario);
 
 			return new ResponseEntity<Usuario>(user, HttpStatus.OK);
