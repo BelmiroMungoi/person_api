@@ -1,12 +1,16 @@
 package com.bbm.person.api.model;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Usuario implements Serializable {
@@ -20,6 +24,9 @@ public class Usuario implements Serializable {
 	private String fullName;
 	private String userName;
 	private String passWord;
+
+	@OneToMany(mappedBy = "usuario", orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private List<Endereco> enderecos;
 
 	public Long getId() {
 		return id;
@@ -51,6 +58,14 @@ public class Usuario implements Serializable {
 
 	public void setPassWord(String passWord) {
 		this.passWord = passWord;
+	}
+
+	public List<Endereco> getEnderecos() {
+		return enderecos;
+	}
+
+	public void setEnderecos(List<Endereco> enderecos) {
+		this.enderecos = enderecos;
 	}
 
 	@Override
