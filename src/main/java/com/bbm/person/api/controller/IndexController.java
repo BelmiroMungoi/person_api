@@ -28,6 +28,10 @@ public class IndexController {
 	@ResponseBody
 	public ResponseEntity<Usuario> saveUser(@RequestBody Usuario usuario) {
 
+		for (int i = 0; i < usuario.getEnderecos().size(); i++) {
+			usuario.getEnderecos().get(i).setUsuario(usuario);
+		}
+
 		Usuario user = usuarioRepository.save(usuario);
 
 		return new ResponseEntity<Usuario>(user, HttpStatus.CREATED);
