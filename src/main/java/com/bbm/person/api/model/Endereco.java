@@ -24,7 +24,7 @@ public class Endereco implements Serializable {
 	private String telefone;
 
 	@JsonIgnore
-	@ManyToOne
+	@ManyToOne(optional = false)
 	private Usuario usuario;
 
 	public Long getId() {
