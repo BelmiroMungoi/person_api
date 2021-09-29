@@ -24,6 +24,7 @@ public class PersonApiApplication implements WebMvcConfigurer{
 
 	public static void main(String[] args) {
 		SpringApplication.run(PersonApiApplication.class, args);
+		//System.out.println(new BCryptPasswordEncoder().encode("admin"));
 	}
 	
 	//Mapeamento global
