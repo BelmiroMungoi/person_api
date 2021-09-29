@@ -1,12 +1,11 @@
 package com.bbm.person.api.service;
 
+import java.io.IOException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -36,7 +35,7 @@ public class JwtAutenticationService {
 	private static final String HEADER_STRING = "Authorization";
 
 	// Gera Token de autenticacao e adiciona ao cabecalho e respoata Http
-	public void addAuthentication(HttpServletResponse response, String userName) throws Exception {
+	public void addAuthentication(HttpServletResponse response, String userName) throws IOException {
 
 		// Montagem do Token
 		String jwt = Jwts.builder().setSubject(userName)// Adiciona o usuario
@@ -53,7 +52,7 @@ public class JwtAutenticationService {
 		response.getWriter().write("{\"Authorization\": \"" + token + "\"}");
 	}
 
-	// Retorna o usuario validado caso nao retorna null
+	// Retorna o usuario validado, caso nao retorna null
 	public Authentication getAuthentication(HttpServletRequest request) {
 
 		// Pega o token enviado no cabelhaco
