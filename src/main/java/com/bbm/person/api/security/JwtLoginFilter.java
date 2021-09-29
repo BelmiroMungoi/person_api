@@ -15,7 +15,6 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.bbm.person.api.model.Usuario;
-import com.bbm.person.api.service.JwtAutenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 //Estabelece o gerenciador do Token
@@ -48,7 +47,7 @@ public class JwtLoginFilter  extends AbstractAuthenticationProcessingFilter{
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
 		
-		new JwtAutenticationService().addAuthentication(response, authResult.getName());
+		new JwtAuthenticationService().addAuthentication(response, authResult.getName());
 	}
 
 }
