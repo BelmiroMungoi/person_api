@@ -72,6 +72,14 @@ public class IndexController {
 				usuario.getEnderecos().get(i).setUsuario(usuario);
 			}
 
+			Usuario userTemp = usuarioRepository.findByUserName(usuario.getUsername());
+			
+			//Caso a senha inserida senha nova ira criptografar para atualizar
+			if (!userTemp.getPassWord().equals(usuario.getPassWord())) {
+				String senhaCript = new BCryptPasswordEncoder().encode(usuario.getPassWord());
+				usuario.setPassWord(senhaCript);
+			}
+
 			Usuario user = usuarioRepository.saveAndFlush(usuario);
 
 			return new ResponseEntity<Usuario>(user, HttpStatus.OK);
