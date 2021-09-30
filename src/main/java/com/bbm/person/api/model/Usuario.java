@@ -133,7 +133,6 @@ public class Usuario implements UserDetails {
 		return this.passWord;
 	}
 
-	@JsonIgnore
 	@Override
 	public String getUsername() {
 		return this.userName;
