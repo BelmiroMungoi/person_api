@@ -56,6 +56,8 @@ public class Usuario implements UserDetails {
 		referencedColumnName = "id", table = "role", unique = false, updatable = false,
 		foreignKey = @ForeignKey(name = "role_fk", value = ConstraintMode.CONSTRAINT)))
 	private List<Role> roles;
+	
+	private String token = "";
 
 	public Long getId() {
 		return id;
@@ -103,6 +105,14 @@ public class Usuario implements UserDetails {
 	
 	public void setRoles(List<Role> roles) {
 		this.roles = roles;
+	}
+	
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	@Override
