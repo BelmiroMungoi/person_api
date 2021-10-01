@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bbm.person.api.model.Usuario;
+import com.bbm.person.api.model.dto.UsuarioDto;
 import com.bbm.person.api.repository.UsuarioRepository;
 
 @CrossOrigin
@@ -56,11 +57,11 @@ public class IndexController {
 	}
 
 	@GetMapping(value = "/{id}", produces = "application/json")
-	public ResponseEntity<Usuario> findById(@PathVariable("id") Long id) {
+	public ResponseEntity<UsuarioDto> findById(@PathVariable("id") Long id) {
 
 		Usuario usuario = usuarioRepository.findById(id).get();
 
-		return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+		return new ResponseEntity<UsuarioDto>(new UsuarioDto(usuario), HttpStatus.OK);
 	}
 
 	@PutMapping(value = "/", produces = "application/json")
