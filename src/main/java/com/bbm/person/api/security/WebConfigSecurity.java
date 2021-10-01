@@ -2,6 +2,7 @@ package com.bbm.person.api.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,6 +26,7 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter{
 		.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 		.disable().authorizeRequests()
 		.antMatchers("/").permitAll()
+		.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 		.antMatchers("/login").permitAll()// permite o acesso a pagina de login
 		.anyRequest().authenticated().and().logout().logoutSuccessUrl("/login")//redeciona o usuario quando fizer logout
 		
