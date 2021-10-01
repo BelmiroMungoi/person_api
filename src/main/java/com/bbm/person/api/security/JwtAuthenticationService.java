@@ -49,6 +49,9 @@ public class JwtAuthenticationService {
 		// Adiciona no cabecalho http
 		response.addHeader(HEADER_STRING, token);
 
+		//Atualiza o token na base de dados
+		ApplicationContextLoad.getContext().getBean(UsuarioRepository.class).updateTokenUser(jwt, userName);
+		
 		// liberando a resposta para outros servers
 		liberaCors(response);
 
