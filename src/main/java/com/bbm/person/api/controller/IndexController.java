@@ -55,6 +55,15 @@ public class IndexController {
 		
 		return new ResponseEntity<List<Usuario>>(usuarios, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/nome/{nome}", produces = "application/json")
+	@CachePut("cacheUsuario")
+	public ResponseEntity<List<Usuario>> findByName(@PathVariable("nome") String nome) throws InterruptedException {
+
+		List<Usuario> usuarios = usuarioRepository.findByName(nome.trim().toUpperCase());
+		
+		return new ResponseEntity<List<Usuario>>(usuarios, HttpStatus.OK);
+	}
 
 	@GetMapping(value = "/{id}", produces = "application/json")
 	public ResponseEntity<UsuarioDto> findById(@PathVariable("id") Long id) {
