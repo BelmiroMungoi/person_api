@@ -1,5 +1,7 @@
 package com.bbm.person.api.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,6 +15,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
 
 	@Query("select u from Usuario u where u.userName = ?1")
 	Usuario findByUserName(String userName);
+	
+	@Query("select p from Usuario p where upper(trim(p.fullName)) like %?1%")
+	List<Usuario> findByName(String name);
 	
 	@Modifying
 	@Transactional
