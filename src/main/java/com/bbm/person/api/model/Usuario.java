@@ -1,5 +1,6 @@
 package com.bbm.person.api.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +41,7 @@ public class Usuario implements UserDetails {
 	private String passWord;
 
 	@OneToMany(mappedBy = "usuario", orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Endereco> enderecos;
+	private List<Endereco> enderecos = new ArrayList<Endereco>();
 	
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "usuario_roles", 
@@ -55,7 +56,7 @@ public class Usuario implements UserDetails {
 	inverseJoinColumns = @JoinColumn(name = "role_id",
 		referencedColumnName = "id", table = "role", unique = false, updatable = false,
 		foreignKey = @ForeignKey(name = "role_fk", value = ConstraintMode.CONSTRAINT)))
-	private List<Role> roles;
+	private List<Role> roles = new ArrayList<Role>();
 	
 	private String token = "";
 
