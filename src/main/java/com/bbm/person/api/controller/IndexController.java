@@ -1,6 +1,7 @@
 package com.bbm.person.api.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bbm.person.api.model.Usuario;
-import com.bbm.person.api.model.dto.UsuarioDto;
 import com.bbm.person.api.repository.UsuarioRepository;
 
 @CrossOrigin
@@ -66,11 +66,11 @@ public class IndexController {
 	}
 
 	@GetMapping(value = "/{id}", produces = "application/json")
-	public ResponseEntity<UsuarioDto> findById(@PathVariable("id") Long id) {
+	public ResponseEntity<Usuario> findById(@PathVariable("id") Long id) {
 
-		Usuario usuario = usuarioRepository.findById(id).get();
+		Optional<Usuario> usuario = usuarioRepository.findById(id);
 
-		return new ResponseEntity<UsuarioDto>(new UsuarioDto(usuario), HttpStatus.OK);
+		return new ResponseEntity<Usuario>(usuario.get(), HttpStatus.OK);
 	}
 
 	@PutMapping(value = "/", produces = "application/json")
@@ -87,7 +87,7 @@ public class IndexController {
 				usuario.getEnderecos().get(i).setUsuario(usuario);
 			}
 
-			Usuario userTemp = usuarioRepository.findByUserName(usuario.getUsername());
+			Usuario userTemp = usuarioRepository.findById(usuario.getId()).get();
 			
 			//Caso a senha inserida senha nova ira criptografar para atualizar
 			if (!userTemp.getPassWord().equals(usuario.getPassWord())) {
