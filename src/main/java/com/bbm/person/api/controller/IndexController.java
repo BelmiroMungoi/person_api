@@ -3,6 +3,8 @@ package com.bbm.person.api.controller;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -33,7 +35,7 @@ public class IndexController {
 
 	@PostMapping(value = "/", produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<Usuario> saveUser(@RequestBody Usuario usuario) {
+	public ResponseEntity<Usuario> saveUser(@Valid @RequestBody Usuario usuario) {
 
 		for (int i = 0; i < usuario.getEnderecos().size(); i++) {
 			usuario.getEnderecos().get(i).setUsuario(usuario);
@@ -75,7 +77,7 @@ public class IndexController {
 
 	@PutMapping(value = "/", produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<?> updateUser(@RequestBody Usuario usuario) {
+	public ResponseEntity<?> updateUser(@Valid @RequestBody Usuario usuario) {
 
 		if (usuario.getId() == null) {
 
