@@ -18,6 +18,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,11 +34,13 @@ public class Usuario implements UserDetails {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@NotBlank
 	private String fullName;
 	
 	@Column(unique = true)
 	private String userName;
 	
+	@NotBlank
 	private String passWord;
 
 	@OneToMany(mappedBy = "usuario", orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
