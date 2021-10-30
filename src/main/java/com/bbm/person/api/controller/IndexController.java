@@ -10,7 +10,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bbm.person.api.model.Usuario;
 import com.bbm.person.api.repository.UsuarioRepository;
+import com.bbm.person.api.service.UsuarioService;
 
 @CrossOrigin
 @RestController
@@ -32,18 +32,17 @@ public class IndexController {
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+	
+	@Autowired
+	private UsuarioService usuarioService;
 
 	@PostMapping(value = "/", produces = "application/json")
 	@ResponseBody
 	public ResponseEntity<Usuario> saveUser(@Valid @RequestBody Usuario usuario) {
 
-		for (int i = 0; i < usuario.getEnderecos().size(); i++) {
-			usuario.getEnderecos().get(i).setUsuario(usuario);
-		}
-
-		String senhaCript = new BCryptPasswordEncoder().encode(usuario.getPassWord());
-		usuario.setPassWord(senhaCript);
-		Usuario user = usuarioRepository.save(usuario);
+		Usuario user = usuarioService.saveUser(usuario);
+		
+		usuarioService.insereUserPadrao(usuario.getId());
 
 		return new ResponseEntity<Usuario>(user, HttpStatus.CREATED);
 	}
@@ -85,19 +84,7 @@ public class IndexController {
 
 		} else {
 
-			for (int i = 0; i < usuario.getEnderecos().size(); i++) {
-				usuario.getEnderecos().get(i).setUsuario(usuario);
-			}
-
-			Usuario userTemp = usuarioRepository.findById(usuario.getId()).get();
-			
-			//Caso a senha inserida senha nova ira criptografar para atualizar
-			if (!userTemp.getPassWord().equals(usuario.getPassWord())) {
-				String senhaCript = new BCryptPasswordEncoder().encode(usuario.getPassWord());
-				usuario.setPassWord(senhaCript);
-			}
-
-			Usuario user = usuarioRepository.saveAndFlush(usuario);
+			Usuario user = usuarioService.updateUser(usuario);
 
 			return new ResponseEntity<Usuario>(user, HttpStatus.OK);
 		}
