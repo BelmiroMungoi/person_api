@@ -29,13 +29,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 			+ "and constraint_name <> 'unique_role_user';")
 	String consultaConstraint();
 
-	/*
-	 * @Modifying
-	 * 
-	 * @Query(nativeQuery = true, value =
-	 * "alter table usuario_roles drop constraint ?1") void removeConstraint(String
-	 * constraint);
-	 */
+	@Modifying
+	@Query(nativeQuery = true, value = "alter table usuario_roles drop constraint ?1")
+	void removeConstraint(String constraint);
 
 	@Modifying
 	@Transactional
