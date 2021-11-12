@@ -8,6 +8,9 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bbm.person.api.model.Usuario;
+import com.bbm.person.api.repository.EnderecoRepository;
 import com.bbm.person.api.repository.UsuarioRepository;
 import com.bbm.person.api.service.UsuarioService;
 
@@ -32,6 +36,9 @@ public class IndexController {
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+	
+	@Autowired
+	private EnderecoRepository enderecoRepository;
 	
 	@Autowired
 	private UsuarioService usuarioService;
@@ -50,11 +57,13 @@ public class IndexController {
 	@GetMapping(value = "/", produces = "application/json")
 	@CacheEvict(value = "cacheUsuario", allEntries = true)
 	@CachePut("cacheUsuario")
-	public ResponseEntity<List<Usuario>> findAll() throws InterruptedException {
+	public ResponseEntity<Page<Usuario>> findAll() throws InterruptedException {
 
-		List<Usuario> usuarios = usuarioRepository.findAll();
+		PageRequest pageRequest = PageRequest.of(0, 8, Sort.by("fullName"));
 		
-		return new ResponseEntity<List<Usuario>>(usuarios, HttpStatus.OK);
+		Page<Usuario> usuarios = usuarioRepository.findAll(pageRequest);
+				
+		return new ResponseEntity<Page<Usuario>>(usuarios, HttpStatus.OK);
 	}
 	
 	@GetMapping(value = "/nome/{nome}", produces = "application/json")
@@ -98,5 +107,13 @@ public class IndexController {
 
 		return new ResponseEntity<String>("Usuário Deletado com Sucesso", HttpStatus.OK);
 
+	}
+	
+	@DeleteMapping(value = "/removeEndereco/{id}", produces = "application/text")
+	public String deleteEndereco(@PathVariable("id") Long id) {
+		
+		enderecoRepository.deleteById(id);
+		
+		return "Deletado Com Sucesso";
 	}
 }
