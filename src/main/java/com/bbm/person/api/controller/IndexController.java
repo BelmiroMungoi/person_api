@@ -1,6 +1,5 @@
 package com.bbm.person.api.controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -36,10 +35,10 @@ public class IndexController {
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
-	
+
 	@Autowired
 	private EnderecoRepository enderecoRepository;
-	
+
 	@Autowired
 	private UsuarioService usuarioService;
 
@@ -48,7 +47,7 @@ public class IndexController {
 	public ResponseEntity<Usuario> saveUser(@Valid @RequestBody Usuario usuario) {
 
 		Usuario user = usuarioService.saveUser(usuario);
-		
+
 		usuarioService.insereUserPadrao(usuario.getId());
 
 		return new ResponseEntity<Usuario>(user, HttpStatus.CREATED);
@@ -60,31 +59,43 @@ public class IndexController {
 	public ResponseEntity<Page<Usuario>> findAll() throws InterruptedException {
 
 		PageRequest pageRequest = PageRequest.of(0, 8, Sort.by("fullName"));
-		
+
 		Page<Usuario> usuarios = usuarioRepository.findAll(pageRequest);
-				
+
 		return new ResponseEntity<Page<Usuario>>(usuarios, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/page/{page}", produces = "application/json")
 	@CacheEvict(value = "cacheUsuario", allEntries = true)
 	@CachePut("cacheUsuario")
 	public ResponseEntity<Page<Usuario>> findAllPerPage(@PathVariable("page") int page) throws InterruptedException {
 
 		PageRequest pageRequest = PageRequest.of(page, 8, Sort.by("fullName"));
-		
+
 		Page<Usuario> usuarios = usuarioRepository.findAll(pageRequest);
-				
+
 		return new ResponseEntity<Page<Usuario>>(usuarios, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/nome/{nome}", produces = "application/json")
 	@CachePut("cacheUsuario")
-	public ResponseEntity<List<Usuario>> findByName(@PathVariable("nome") String nome) throws InterruptedException {
+	public ResponseEntity<Page<Usuario>> findByName(@PathVariable("nome") String nome) throws InterruptedException {
 
-		List<Usuario> usuarios = usuarioRepository.findByName(nome.trim().toUpperCase());
-		
-		return new ResponseEntity<List<Usuario>>(usuarios, HttpStatus.OK);
+		PageRequest pageRequest = null;
+		Page<Usuario> usuarios = null;
+
+		if (nome == null || (nome != null && nome.trim().isEmpty()) 
+				|| nome.equalsIgnoreCase("undefined")) {
+
+			pageRequest = PageRequest.of(0, 8, Sort.by("fullName"));
+			usuarios = usuarioRepository.findAll(pageRequest);
+
+		} else {
+			pageRequest = PageRequest.of(0, 8, Sort.by("fullName"));
+			usuarios = usuarioRepository.findByNamePage(nome, pageRequest);
+		}
+
+		return new ResponseEntity<Page<Usuario>>(usuarios, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/{id}", produces = "application/json")
@@ -120,12 +131,12 @@ public class IndexController {
 		return new ResponseEntity<String>("Usuário Deletado com Sucesso", HttpStatus.OK);
 
 	}
-	
+
 	@DeleteMapping(value = "/removeEndereco/{id}", produces = "application/text")
 	public String deleteEndereco(@PathVariable("id") Long id) {
-		
+
 		enderecoRepository.deleteById(id);
-		
+
 		return "Deletado Com Sucesso";
 	}
 }
