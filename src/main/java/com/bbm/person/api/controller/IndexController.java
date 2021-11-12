@@ -66,6 +66,18 @@ public class IndexController {
 		return new ResponseEntity<Page<Usuario>>(usuarios, HttpStatus.OK);
 	}
 	
+	@GetMapping(value = "/page/{page}", produces = "application/json")
+	@CacheEvict(value = "cacheUsuario", allEntries = true)
+	@CachePut("cacheUsuario")
+	public ResponseEntity<Page<Usuario>> findAllPerPage(@PathVariable("page") int page) throws InterruptedException {
+
+		PageRequest pageRequest = PageRequest.of(page, 8, Sort.by("fullName"));
+		
+		Page<Usuario> usuarios = usuarioRepository.findAll(pageRequest);
+				
+		return new ResponseEntity<Page<Usuario>>(usuarios, HttpStatus.OK);
+	}
+	
 	@GetMapping(value = "/nome/{nome}", produces = "application/json")
 	@CachePut("cacheUsuario")
 	public ResponseEntity<List<Usuario>> findByName(@PathVariable("nome") String nome) throws InterruptedException {
