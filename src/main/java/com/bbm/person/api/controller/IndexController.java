@@ -79,20 +79,42 @@ public class IndexController {
 
 	@GetMapping(value = "/nome/{nome}", produces = "application/json")
 	@CachePut("cacheUsuario")
-	public ResponseEntity<Page<Usuario>> findByName(@PathVariable("nome") String nome) throws InterruptedException {
+	public ResponseEntity<Page<Usuario>> findByName(@PathVariable("nome") Optional<String> nome) throws InterruptedException {
 
 		PageRequest pageRequest = null;
 		Page<Usuario> usuarios = null;
 
-		if (nome == null || (nome != null && nome.trim().isEmpty()) 
-				|| nome.equalsIgnoreCase("undefined")) {
+		if (nome == null || (nome != null && nome.toString().trim().isEmpty()) 
+				|| nome.toString().equalsIgnoreCase("undefined")) {
 
 			pageRequest = PageRequest.of(0, 8, Sort.by("fullName"));
 			usuarios = usuarioRepository.findAll(pageRequest);
 
 		} else {
 			pageRequest = PageRequest.of(0, 8, Sort.by("fullName"));
-			usuarios = usuarioRepository.findByNamePage(nome, pageRequest);
+			usuarios = usuarioRepository.findByName(nome.orElse("").toString().trim().toUpperCase(), pageRequest);
+		}
+
+		return new ResponseEntity<Page<Usuario>>(usuarios, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/nome/{nome}/page/{page}", produces = "application/json")
+	@CachePut("cacheUsuario")
+	public ResponseEntity<Page<Usuario>> findByNamePage(@PathVariable("nome") Optional<String> nome,
+			@PathVariable("page") int page) throws InterruptedException {
+
+		PageRequest pageRequest = null;
+		Page<Usuario> usuarios = null;
+
+		if (nome == null || (nome != null && nome.toString().trim().isEmpty()) 
+				|| nome.toString().equalsIgnoreCase("undefined")) {
+
+			pageRequest = PageRequest.of(page, 8, Sort.by("fullName"));
+			usuarios = usuarioRepository.findAll(pageRequest);
+
+		} else {
+			pageRequest = PageRequest.of(page, 8, Sort.by("fullName"));
+			usuarios = usuarioRepository.findByName(nome.orElse("").toString().trim().toUpperCase(), pageRequest);
 		}
 
 		return new ResponseEntity<Page<Usuario>>(usuarios, HttpStatus.OK);
