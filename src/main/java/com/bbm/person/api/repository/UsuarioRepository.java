@@ -1,7 +1,5 @@
 package com.bbm.person.api.repository;
 
-import java.util.List;
-
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -21,14 +19,15 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 	Usuario findByUserName(String userName);
 
 	@Query("select p from Usuario p where upper(trim(p.fullName)) like %?1%")
-	List<Usuario> findByName(String name);
+	Page<Usuario> findByName(String name, PageRequest pageRequest);
 
 	@Modifying
 	@Transactional
 	@Query(nativeQuery = true, value = "update usuario set token = ?1 where user_name = ?2")
 	void updateTokenUser(String token, String userName);
 
-	@Query(nativeQuery = true, value = "select constraint_name from information_schema.constraint_column_usage "
+	@Query(nativeQuery = true, value = "select constraint_name from "
+			+ "information_schema.constraint_column_usage "
 			+ "where table_name = 'usuario_roles' and column_name = 'role_id' "
 			+ "and constraint_name <> 'unique_role_user';")
 	String consultaConstraint();
@@ -43,21 +42,20 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 			+ "values(?1, (select id from role where name_role = 'ROLE_USER'))")
 	void insereAcessoPadrao(Long id);
 
-	default Page<Usuario> findByNamePage(String nome, PageRequest pageRequest){
+	default Page<Usuario> findByNamePerPage(String nome, PageRequest pageRequest){
 		
 		Usuario usuario = new Usuario();
 		usuario.setFullName(nome);
 		
-		//Configura a pesquisa por e paginacao
-		ExampleMatcher exampleMatcher = ExampleMatcher.matchingAny()
-				.withMatcher("fullName", ExampleMatcher.GenericPropertyMatchers
-						.contains().ignoreCase());
-		
+		ExampleMatcher exampleMatcher = ExampleMatcher.matchingAny().withMatcher("fullName",
+				ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+
+		// Une o objecto com o valor e configura a consulta
 		Example<Usuario> example = Example.of(usuario, exampleMatcher);
-		
-		Page<Usuario> result = findAll(example, pageRequest);
-		
-		return result;
+
+		Page<Usuario> usuarios = findAll(example, pageRequest);
+
+		return usuarios;
 	}
 	
 
