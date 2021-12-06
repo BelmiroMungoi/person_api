@@ -17,6 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -40,34 +41,33 @@ public class Usuario implements UserDetails {
 
 	@NotBlank
 	private String fullName;
-	
+
 	@Column(unique = true)
 	private String userName;
-	
+
 	@NotBlank
 	private String passWord;
 
 	@OneToMany(mappedBy = "usuario", orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Endereco> enderecos = new ArrayList<Endereco>();
-	
+
 	@OneToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "usuario_roles", 
-	
-	joinColumns = @JoinColumn(name = "usuario_id",
-		referencedColumnName = "id", table = "usuario", unique = false, 
-		foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)),
-		
-	inverseJoinColumns = @JoinColumn(name = "role_id",
-		referencedColumnName = "id", table = "role", unique = false, updatable = false,
-		foreignKey = @ForeignKey(name = "role_fk", value = ConstraintMode.CONSTRAINT)))
+	@JoinTable(name = "usuario_roles",
+
+			joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", unique = false, foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)),
+
+			inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id", table = "role", unique = false, updatable = false, foreignKey = @ForeignKey(name = "role_fk", value = ConstraintMode.CONSTRAINT)))
 	private List<Role> roles = new ArrayList<Role>();
-	
+
 	private String token = "";
-	
+
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(iso = ISO.DATE, pattern = "dd/MM/yyyy")
 	private Date dataNascimento;
+
+	@ManyToOne
+	private Profissao profissaso;
 
 	public Long getId() {
 		return id;
@@ -108,15 +108,15 @@ public class Usuario implements UserDetails {
 	public void setEnderecos(List<Endereco> enderecos) {
 		this.enderecos = enderecos;
 	}
-	
+
 	public List<Role> getRoles() {
 		return roles;
 	}
-	
+
 	public void setRoles(List<Role> roles) {
 		this.roles = roles;
 	}
-	
+
 	public String getToken() {
 		return token;
 	}
@@ -131,6 +131,14 @@ public class Usuario implements UserDetails {
 
 	public void setDataNascimento(Date dataNascimento) {
 		this.dataNascimento = dataNascimento;
+	}
+
+	public Profissao getProfissaso() {
+		return profissaso;
+	}
+
+	public void setProfissaso(Profissao profissaso) {
+		this.profissaso = profissaso;
 	}
 
 	@Override
