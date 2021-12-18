@@ -1,5 +1,6 @@
 package com.bbm.person.api.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -68,6 +69,8 @@ public class Usuario implements UserDetails {
 
 	@ManyToOne
 	private Profissao profissaso;
+	
+	private BigDecimal salario;
 
 	public Long getId() {
 		return id;
@@ -139,6 +142,14 @@ public class Usuario implements UserDetails {
 
 	public void setProfissaso(Profissao profissaso) {
 		this.profissaso = profissaso;
+	}
+
+	public BigDecimal getSalario() {
+		return salario;
+	}
+
+	public void setSalario(BigDecimal salario) {
+		this.salario = salario;
 	}
 
 	@Override
