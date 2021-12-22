@@ -25,7 +25,7 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter{
 		http.csrf()//protege contra usuarios nao validados por token 
 		.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 		.disable().authorizeRequests()
-		.antMatchers("/").permitAll()
+		.antMatchers("/", "/recuperar/**").permitAll()
 		.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 		.antMatchers("/login").permitAll()// permite o acesso a pagina de login
 		.anyRequest().authenticated().and().logout().logoutSuccessUrl("/login")//redeciona o usuario quando fizer logout
