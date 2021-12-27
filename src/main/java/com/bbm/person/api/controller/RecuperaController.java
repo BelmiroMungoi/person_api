@@ -6,6 +6,7 @@ import java.util.Calendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,8 +41,8 @@ public class RecuperaController {
 			
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			String senhaNova = dateFormat.format(Calendar.getInstance().getTime());
-			
-			repository.updateSenha(senhaNova, user.getId());
+			String senhaCrypto = new BCryptPasswordEncoder().encode(senhaNova);
+			repository.updateSenha(senhaCrypto, user.getId());
 			
 			mailService.sendMail("Recuperacão de Senha",
 					user.getUserName(),
