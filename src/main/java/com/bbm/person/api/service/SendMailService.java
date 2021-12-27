@@ -15,20 +15,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SendMailService {
-
+	
 	private String userName = "belmiroteste@gmail.com";
-	private String password = "belmiroteste@29";
+	private String password = "";
 
 	public void sendMail(String assunto, String destino, String msg) throws Exception {
 		
 		Properties properties = new Properties();
-		properties.put("mail.smtp.ssl.trust", "*");
 		properties.put("mail.smtp.auth", "true");//Autorizãcão
 		properties.put("mail.smtp.starttls", "true");//Autenticacão
 		properties.put("mail.smtp.host", "smtp.gmail.com");//Servidor Google
 		properties.put("mail.smtp.port", "465");//Porta do Server
 		properties.put("mail.smtp.socketFactory.port", "465");//Porta do socket
-		properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");//Classe de conexão do socket
+		properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SocketFactory");//Classe de conexão do socket
 		
 		Session session = Session.getInstance(properties, new Authenticator() {
 			@Override
@@ -47,5 +46,6 @@ public class SendMailService {
 		message.setText(msg);//Conteudo do email
 		
 		Transport.send(message);//Envia o email
+		
 	}
 }
