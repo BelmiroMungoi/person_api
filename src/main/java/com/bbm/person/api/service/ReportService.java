@@ -34,7 +34,12 @@ public class ReportService implements Serializable {
 		//Gerar relatorio com dados e impressao
 		JasperPrint print = JasperFillManager.fillReport(caminho, new HashMap<>(), connection);
 		
-		//Exporta para byte o pdf para realizar o download
-		return JasperExportManager.exportReportToPdf(print);
+		//Exporta para byte o pdf para realizar o download		
+		byte[] retorno = JasperExportManager.exportReportToPdf(print);
+		
+		//Fecha a conexao
+		connection.close();
+		
+		return retorno;
 	}
 }
