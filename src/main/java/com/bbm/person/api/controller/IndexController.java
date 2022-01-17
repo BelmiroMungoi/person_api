@@ -2,8 +2,10 @@ package com.bbm.person.api.controller;
 
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bbm.person.api.model.Usuario;
 import com.bbm.person.api.repository.EnderecoRepository;
 import com.bbm.person.api.repository.UsuarioRepository;
+import com.bbm.person.api.service.ReportService;
 import com.bbm.person.api.service.UsuarioService;
 
 @CrossOrigin
@@ -41,6 +44,9 @@ public class IndexController {
 
 	@Autowired
 	private UsuarioService usuarioService;
+	
+	@Autowired
+	private ReportService reportService;
 
 	@PostMapping(value = "/", produces = "application/json")
 	@ResponseBody
@@ -160,5 +166,15 @@ public class IndexController {
 		enderecoRepository.deleteById(id);
 
 		return "Deletado Com Sucesso";
+	}
+	
+	@GetMapping(value = "/report", produces = "application/text")
+	public ResponseEntity<String> downloadReport(HttpServletRequest request) throws Exception{
+		
+		byte[] pdf = reportService.gerarRelatorio("usuario", request.getServletContext());
+		
+		String base64Pdf = "data:application/pdf;base64,"  + Base64.encodeBase64String(pdf);
+		
+		return new ResponseEntity<String>(base64Pdf, HttpStatus.OK);
 	}
 }
