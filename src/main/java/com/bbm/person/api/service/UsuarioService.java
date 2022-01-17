@@ -34,10 +34,9 @@ public class UsuarioService {
 		for (int i = 0; i < usuario.getEnderecos().size(); i++) {
 			usuario.getEnderecos().get(i).setUsuario(usuario);
 		}
-
 		Usuario userTemp = usuarioRepository.findById(usuario.getId()).get();
 
-		// Caso a senha inserida senha nova ira criptografar para atualizar
+		// Caso a senha inserida seja nova ira criptografar para atualizar
 		if (!userTemp.getPassWord().equals(usuario.getPassWord())) {
 			String senhaCript = new BCryptPasswordEncoder().encode(usuario.getPassWord());
 			usuario.setPassWord(senhaCript);
@@ -52,9 +51,7 @@ public class UsuarioService {
 		if (constraint != null) {
 			// Remove a constraint
 			jdbcTemplate.execute(" alter table usuario_roles drop constraint " + constraint);
-		}
-		
-		// Insere Usuario padrao
+		}		
 		usuarioRepository.insereAcessoPadrao(id);
 	}
 
