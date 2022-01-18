@@ -3,7 +3,7 @@ package com.bbm.person.api.service;
 import java.io.File;
 import java.io.Serializable;
 import java.sql.Connection;
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 
@@ -23,7 +23,7 @@ public class ReportService implements Serializable {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	public byte[] gerarRelatorio(String nomeRelatorio, ServletContext context) throws Exception {
+	public byte[] gerarRelatorio(String nomeRelatorio, Map<String, Object> params, ServletContext context) throws Exception {
 		
 		//Obter conexao com a base de dados
 		Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -32,7 +32,7 @@ public class ReportService implements Serializable {
 		String caminho = context.getRealPath("reports") + File.separator + nomeRelatorio + ".jasper";
 		
 		//Gerar relatorio com dados e impressao
-		JasperPrint print = JasperFillManager.fillReport(caminho, new HashMap<>(), connection);
+		JasperPrint print = JasperFillManager.fillReport(caminho, params, connection);
 		
 		//Exporta para byte o pdf para realizar o download		
 		byte[] retorno = JasperExportManager.exportReportToPdf(print);
