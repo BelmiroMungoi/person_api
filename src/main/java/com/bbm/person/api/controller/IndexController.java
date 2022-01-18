@@ -1,10 +1,14 @@
 package com.bbm.person.api.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -172,7 +176,7 @@ public class IndexController {
 	@GetMapping(value = "/report", produces = "application/text")
 	public ResponseEntity<String> downloadReport(HttpServletRequest request) throws Exception{
 		
-		byte[] pdf = reportService.gerarRelatorio("usuario", request.getServletContext());
+		byte[] pdf = reportService.gerarRelatorio("usuario", new HashedMap(), request.getServletContext());
 		
 		String base64Pdf = "data:application/pdf;base64,"  + Base64.encodeBase64String(pdf);
 		
@@ -183,7 +187,17 @@ public class IndexController {
 	public ResponseEntity<String> downloadReportParam(HttpServletRequest request, 
 			@RequestBody UserReport userReport)throws Exception{
 		
-		byte[] pdf = reportService.gerarRelatorio("usuario", request.getServletContext());
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");		
+		String dataInicial = dateFormat.format(format.parse(userReport.getDataInicial()));
+		String dataFinal = dateFormat.format(format.parse(userReport.getDataFinal()));
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("DATA_INICIAL", dataInicial);
+		params.put("DATA_FINAL", dataFinal);
+		
+		byte[] pdf = reportService.gerarRelatorio("usuarioParam", params, request.getServletContext());
 		
 		String base64Pdf = "data:application/pdf;base64,"  + Base64.encodeBase64String(pdf);
 		
