@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bbm.person.api.model.UserReport;
 import com.bbm.person.api.model.Usuario;
 import com.bbm.person.api.repository.EnderecoRepository;
 import com.bbm.person.api.repository.UsuarioRepository;
@@ -170,6 +171,17 @@ public class IndexController {
 	
 	@GetMapping(value = "/report", produces = "application/text")
 	public ResponseEntity<String> downloadReport(HttpServletRequest request) throws Exception{
+		
+		byte[] pdf = reportService.gerarRelatorio("usuario", request.getServletContext());
+		
+		String base64Pdf = "data:application/pdf;base64,"  + Base64.encodeBase64String(pdf);
+		
+		return new ResponseEntity<String>(base64Pdf, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/report/", produces = "application/text")
+	public ResponseEntity<String> downloadReportParam(HttpServletRequest request, 
+			@RequestBody UserReport userReport)throws Exception{
 		
 		byte[] pdf = reportService.gerarRelatorio("usuario", request.getServletContext());
 		
