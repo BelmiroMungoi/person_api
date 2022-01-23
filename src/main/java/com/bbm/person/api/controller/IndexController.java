@@ -2,6 +2,7 @@ package com.bbm.person.api.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bbm.person.api.model.UserChart;
 import com.bbm.person.api.model.UserReport;
 import com.bbm.person.api.model.Usuario;
 import com.bbm.person.api.repository.EnderecoRepository;
@@ -49,9 +52,12 @@ public class IndexController {
 
 	@Autowired
 	private UsuarioService usuarioService;
-	
+
 	@Autowired
 	private ReportService reportService;
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
 	@PostMapping(value = "/", produces = "application/json")
 	@ResponseBody
@@ -90,12 +96,13 @@ public class IndexController {
 
 	@GetMapping(value = "/nome/{nome}", produces = "application/json")
 	@CachePut("cacheUsuario")
-	public ResponseEntity<Page<Usuario>> findByName(@PathVariable("nome") Optional<String> nome) throws InterruptedException {
+	public ResponseEntity<Page<Usuario>> findByName(@PathVariable("nome") Optional<String> nome)
+			throws InterruptedException {
 
 		PageRequest pageRequest = null;
 		Page<Usuario> usuarios = null;
 
-		if (nome == null || (nome != null && nome.toString().trim().isEmpty()) 
+		if (nome == null || (nome != null && nome.toString().trim().isEmpty())
 				|| nome.toString().equalsIgnoreCase("undefined")) {
 
 			pageRequest = PageRequest.of(0, 8, Sort.by("fullName"));
@@ -108,7 +115,7 @@ public class IndexController {
 
 		return new ResponseEntity<Page<Usuario>>(usuarios, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/nome/{nome}/page/{page}", produces = "application/json")
 	@CachePut("cacheUsuario")
 	public ResponseEntity<Page<Usuario>> findByNamePage(@PathVariable("nome") Optional<String> nome,
@@ -117,7 +124,7 @@ public class IndexController {
 		PageRequest pageRequest = null;
 		Page<Usuario> usuarios = null;
 
-		if (nome == null || (nome != null && nome.toString().trim().isEmpty()) 
+		if (nome == null || (nome != null && nome.toString().trim().isEmpty())
 				|| nome.toString().equalsIgnoreCase("undefined")) {
 
 			pageRequest = PageRequest.of(page, 8, Sort.by("fullName"));
@@ -172,35 +179,56 @@ public class IndexController {
 
 		return "Deletado Com Sucesso";
 	}
-	
+
 	@GetMapping(value = "/report", produces = "application/text")
-	public ResponseEntity<String> downloadReport(HttpServletRequest request) throws Exception{
-		
+	public ResponseEntity<String> downloadReport(HttpServletRequest request) throws Exception {
+
 		byte[] pdf = reportService.gerarRelatorio("usuario", new HashedMap(), request.getServletContext());
-		
-		String base64Pdf = "data:application/pdf;base64,"  + Base64.encodeBase64String(pdf);
-		
+
+		String base64Pdf = "data:application/pdf;base64," + Base64.encodeBase64String(pdf);
+
 		return new ResponseEntity<String>(base64Pdf, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/report/", produces = "application/text")
-	public ResponseEntity<String> downloadReportParam(HttpServletRequest request, 
-			@RequestBody UserReport userReport)throws Exception{
-		
+	public ResponseEntity<String> downloadReportParam(HttpServletRequest request, @RequestBody UserReport userReport)
+			throws Exception {
+
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");		
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		String dataInicial = dateFormat.format(format.parse(userReport.getDataInicial()));
 		String dataFinal = dateFormat.format(format.parse(userReport.getDataFinal()));
-		
+
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("DATA_INICIAL", dataInicial);
 		params.put("DATA_FINAL", dataFinal);
-		
+
 		byte[] pdf = reportService.gerarRelatorio("usuarioParam", params, request.getServletContext());
-		
-		String base64Pdf = "data:application/pdf;base64,"  + Base64.encodeBase64String(pdf);
-		
+
+		String base64Pdf = "data:application/pdf;base64," + Base64.encodeBase64String(pdf);
+
 		return new ResponseEntity<String>(base64Pdf, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/grafico", produces = "application/json")
+	public ResponseEntity<UserChart> grafico() {
+
+		UserChart userChart = new UserChart();
+
+		List<String> result = jdbcTemplate.queryForList(
+				"select array_agg( '''' || full_name || '''') from usuario where salario > 0 and full_name <> '' union all select cast(array_agg(salario) as character varying[]) from usuario where salario > 0 and full_name <> ''",
+				String.class);
+		
+		if (!result.isEmpty()) {
+			String names = result.get(0).replaceAll("\\{", "").replaceAll("\\}", "");
+			String salarios = result.get(1).replaceAll("\\{", "").replaceAll("\\}", "");
+		
+			userChart.setFullName(names);
+			userChart.setSalario(salarios);
+		}
+
+		return new ResponseEntity<UserChart>(userChart, HttpStatus.OK);
+
 	}
 }
