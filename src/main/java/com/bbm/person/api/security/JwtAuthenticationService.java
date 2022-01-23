@@ -90,11 +90,8 @@ public class JwtAuthenticationService {
 				}
 			}
 		} catch (ExpiredJwtException e) {
-			try {
-				response.getOutputStream().println("Token Expirado");
-			} catch (IOException e1) {
-
-			}
+			liberaCors(response);
+			return null;
 		}
 
 		liberaCors(response);
